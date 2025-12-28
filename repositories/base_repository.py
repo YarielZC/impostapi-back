@@ -1,5 +1,5 @@
 from pymongo.asynchronous.database import AsyncDatabase
-
+from bson import ObjectId
 class BaseRepository:
   def __init__(self, db: AsyncDatabase, collection: str) -> None:
     self.db = db
@@ -14,4 +14,10 @@ class BaseRepository:
 
     return dic
   
-  
+  def _to_object_id(self, futureId: str) -> bool | ObjectId:
+    try:
+      objId = ObjectId(futureId)
+    except:
+      return False
+    return objId
+
