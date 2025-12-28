@@ -21,3 +21,6 @@ class UserResponse(UserBase):
   model_config = ConfigDict(
     populate_by_name=True,
   )
+
+class UserDB(UserCreate, UserResponse):
+  pass
