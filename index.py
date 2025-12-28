@@ -2,6 +2,7 @@ from fastapi import FastAPI, status
 from fastapi.middleware.cors import CORSMiddleware
 
 from api.auth import auth_router
+from api.manage import manage_router
 
 app = FastAPI(title='ImpostAPI', 
               description=' A high-performance, asynchronous Mock API generator built with FastAPI and MongoDB. It allows developers to design and deploy custom JSON endpoints in seconds, featuring dynamic routing, configurable HTTP status codes, and simulated network latency to streamline frontend development and testing. ',
@@ -16,6 +17,7 @@ app.add_middleware(
 )
 
 app.include_router(auth_router)
+app.include_router(manage_router)
 
 @app.get('/', response_model=dict, status_code=status.HTTP_200_OK)
 async def health():
