@@ -12,7 +12,14 @@ class UserRepository(BaseRepository):
     self.db = database[self.collection]
 
   async def find_one_by_field(self, field: str, value):
-    return await self.db.find_one({field: value})
+    result = await self.db.find_one({field: value})
+
+    try:
+      result = self._map_doc(result)
+    except:
+      return None
+    
+    return result
   
   async def find_one_by_id(self, id: str):
     result = await self.db.find_one({'_id': self._to_object_id(id)})
@@ -22,7 +29,7 @@ class UserRepository(BaseRepository):
     except:
       return None
 
-    return UserResponse(**result)
+    return result
 
   
   async def insert_one(self, user: UserCreate):
