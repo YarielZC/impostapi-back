@@ -11,11 +11,10 @@ mock_router = APIRouter(prefix='/mock',
 @mock_router.api_route('/{user:str}/{project:str}/{fullpath:path}', methods=['GET', 'POST', 'PUT', 'PATCH', 'DELETE'])
 async def m(request: Request, user: str, project: str, fullpath: str, repo: EndpointRepository = Depends(get_endpoint_repository)):
   
-  method = request.method
-  a = method.lower()
+  method = request.method.lower()
 
   endpoint = await repo.find_one_by_advance_method({'path_url': fullpath,
-                                                    'method': a})
+                                                    'method': method})
   
   if not endpoint:
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
