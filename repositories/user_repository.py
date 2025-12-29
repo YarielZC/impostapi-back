@@ -39,6 +39,14 @@ class UserRepository(BaseRepository):
   async def delete_user_by_id(self, id: str):
     result = await self.db.delete_one({'_id': id})
     return result.deleted_count
+  
+  async def update_shared_projects(self, id: str, newSharedProjects: list[str]):
+    result = await self.db.update_one({'_id': self._to_object_id(id)}, {
+      '$set': {
+        'project_shared': newSharedProjects
+      }
+    })
+    return result
 
 def get_user_repository(database: AsyncDatabase = Depends(get_database)):
   return UserRepository(database=database)

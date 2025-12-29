@@ -57,9 +57,9 @@ class EndpointRepository(BaseRepository):
     result = await self.db.delete_many(condition)
     return result.deleted_count
   
-  async def count_endpoints(self, project_id: str):
+  async def find_all(self, project_id: str):
     result = self.db.find({'project_id': project_id})
-    return result
+    return await result.to_list()
 
 
   

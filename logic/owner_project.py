@@ -16,3 +16,5 @@ async def owner_project_validate(project_id: str, repo: ProjectRepository, user:
   if user.id != project.owner_id:
     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                         detail='You do not have permission to do this action')
+  
+  return project

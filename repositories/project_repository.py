@@ -31,7 +31,17 @@ class ProjectRepository(BaseRepository):
     result = await self.db.delete_one({'_id': self._to_object_id(id)})
     return result.deleted_count
   
-
+  async def find_all(self, user_id: str):
+    result = self.db.find({'owner_id': user_id})
+    return await result.to_list()
+  
+  async def update_permissed_users(self, id: str, newPermissedUsers: list[str]):
+    result = await self.db.update_one({'_id': self._to_object_id(id)}, {
+      '$set': {
+        'permissed': newPermissedUsers
+      }
+    })
+    return result
   
 def get_project_repository(database: AsyncDatabase = Depends(get_database)):
   return ProjectRepository(database=database)

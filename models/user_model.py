@@ -5,6 +5,8 @@ class UserBase(BaseModel):
   name: str = Field(min_length=1)
   username: str = Field(min_length=3)
   email: str
+  project_shared: list[str] = []
+  created_at: datetime = Field(default_factory=lambda: datetime.now())
 
   @field_validator('username', mode='before')
   @classmethod
@@ -16,7 +18,6 @@ class UserCreate(UserBase):
   password: str
 class UserResponse(UserBase):
   id: str = Field(alias='_id')
-  created_at: datetime = Field(default_factory=lambda: datetime.now())
 
   model_config = ConfigDict(
     populate_by_name=True,
