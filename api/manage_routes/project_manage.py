@@ -19,8 +19,14 @@ async def create_project(project: ProjectCreate, repo: ProjectRepository = Depen
   
   newProject = project
   newProject.owner_id = user.id
+  if not newProject.owner_id:
+    raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        detail='Owner id not founded')
   
-  result = await repo.insert_one(project)
+  newProject.permissed.append(newProject.owner_id)
+
+  
+  result = await repo.insert_one(newProject)
   
   if not result:
     raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
