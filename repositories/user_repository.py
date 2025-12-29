@@ -33,7 +33,7 @@ class UserRepository(BaseRepository):
 
   
   async def insert_one(self, user: UserCreate):
-    result = await self.db.insert_one(dict(user))
+    result = await self.db.insert_one(user.model_dump())
     return result.inserted_id
     
   async def delete_user_by_id(self, id: str):
