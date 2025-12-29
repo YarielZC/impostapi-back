@@ -13,7 +13,8 @@ class ProjectCreate(BaseModel):
   def set_default_permissed_list(self):
     if not self.owner_id:
       return self
-    self.permissed = [self.owner_id]
+    if self.permissed == []:
+      self.permissed = [self.owner_id]
     return self
 
 class ProjectResponse(ProjectCreate):
