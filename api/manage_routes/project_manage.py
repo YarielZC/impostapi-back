@@ -144,3 +144,37 @@ async def share_project(project_id: str, user_id: str, repo: ProjectRepository =
                         detail='Unknow error')
   
   return JSONResponse(content={'message': 'Project shared'})
+
+@manage_project_router.delete('/share/{project_id:str}/{user_id:str}', response_model=dict, status_code=status.HTTP_202_ACCEPTED)
+async def delete_share(project_id: str, user_id: str, repo: ProjectRepository = Depends(get_project_repository), repoUser: UserRepository = Depends(get_user_repository), user: UserResponse = Depends(auth_user)):
+  
+  project = await owner_project_validate(project_id=project_id,
+                                         repo=repo,
+                                         user=user)
+  
+  if user_id in project.permissed:
+    new_permissed = project.permissed.copy()
+    try:
+      new_permissed.remove(user_id)
+      result = await repo.update_permissed_users(project_id, new_permissed)
+    except:
+      pass
+  
+  user_search = await repoUser.find_one_by_id(user_id)
+
+  if not user_search:
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                        detail='User not founded')
+  
+  user_search = UserResponse(**user_search)
+
+  new_project_shared = user_search.project_shared.copy()
+  try:
+    new_project_shared.remove(project_id)
+    result = await repoUser.update_shared_projects(user_id, new_project_shared)
+  except:
+    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                        detail='Project was not shared with the user')
+  
+  return JSONResponse(content={'message': 'Project unshare'})
+
