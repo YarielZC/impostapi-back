@@ -94,8 +94,8 @@ async def get_all_projects(repo: ProjectRepository = Depends(get_project_reposit
       oldProjectList.remove(project)
       await repoUser.update_shared_projects(user.id, oldProjectList)
 
-    newResult.append(resultProject)
-
+    else:
+      newResult.append(ProjectResponse(**resultProject))
 
   return newResult
 
