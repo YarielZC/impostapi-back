@@ -40,7 +40,16 @@ async def update_endpoint(newEndpoint: EndpointUpdate, id: str, repo: EndpointRe
 
 
 @manage_endpoint_router.delete('/delete/{id}', status_code=status.HTTP_204_NO_CONTENT)
-async def delete_endpoint(id: str, repo: EndpointRepository = Depends(get_endpoint_repository)):
+async def delete_endpoint(id: str, repo: EndpointRepository = Depends(get_endpoint_repository), repoProject: ProjectRepository = Depends(get_project_repository), user: UserResponse = Depends(auth_user)):
+  oldEndpoint = await repo.find_one_by_id(id)
+  if not oldEndpoint:
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                        detail='Endpoint not founded')
+  
+  await only_permissed_member_project(repoProject=repoProject,
+                                project_id=oldEndpoint['project_id'],
+                                user=user)
+
   result = await repo.delete_by_id(id)
 
   if result == 1:
@@ -57,8 +66,12 @@ async def delete_endpoint(id: str, repo: EndpointRepository = Depends(get_endpoi
 @manage_endpoint_router.post('/create', response_model=EndpointResponse, status_code=status.HTTP_201_CREATED)
 async def create_endpoint(endpoint: EndpointCreate, repo: EndpointRepository = Depends(get_endpoint_repository), repoProject: ProjectRepository = Depends(get_project_repository), user: UserResponse = Depends(auth_user)):
   
+  await only_permissed_member_project(repoProject=repoProject,
+                                project_id=endpoint.project_id,
+                                user=user)
+  
   await endpoint_validation(endpoint, repo, repoProject)
-
+  
   id_newed = await repo.insert_one(endpoint)  
 
   if not id_newed:

@@ -9,8 +9,8 @@ async def only_permissed_member_project(repoProject: ProjectRepository, project_
   project = await repoProject.find_one_by_id(project_id)
 
   if not project:
-    raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                        detail='Unknow error ocurred')
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                        detail='Project not founded')
   project = ProjectResponse(**project)
   project_permissed_list = project.permissed
 
