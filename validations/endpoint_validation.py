@@ -4,7 +4,6 @@ from fastapi import HTTPException, status
 
 async def endpoint_validation(endpoint: EndpointCreate, repo: EndpointRepository):
   
-  # Username is a unique key
   found = await repo.find_one_by_advance_method({'project_id': endpoint.project_id, 
                                                  'path_url': endpoint.path_url,
                                                  'method': endpoint.method})

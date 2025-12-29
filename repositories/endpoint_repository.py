@@ -11,6 +11,11 @@ class EndpointRepository(BaseRepository):
     super().__init__(database, 'endpoints')
     self.db = database[self.collection]
 
+  
+  async def update_one_by_id(self, id: str, endpoint: EndpointCreate):
+    result = await self.db.replace_one({'_id': self._to_object_id(id)}, endpoint.model_dump())
+    return result
+
   async def find_one_by_advance_method(self, conditions: dict):
     result = await self.db.find_one(conditions)
 
