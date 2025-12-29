@@ -53,7 +53,7 @@ async def login(repo: UserRepository = Depends(get_user_repository), form: OAuth
     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                         detail='Username or password is wrong')
   
-  access_token_expiration = datetime.now() + timedelta(minutes=settings.TOKEN_DURATION)
+  access_token_expiration = datetime.utcnow() + timedelta(minutes=settings.TOKEN_DURATION)
   access_token = {
     'sub': user.username,
     'exp': access_token_expiration
