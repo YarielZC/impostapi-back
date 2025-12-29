@@ -10,7 +10,7 @@ manage_endpoint_router = APIRouter(prefix='/endpoint',
                    )
 
 @manage_endpoint_router.put('/update/{id}', status_code=status.HTTP_201_CREATED, response_model=EndpointResponse)
-async def update_endpoint(newEndpoint: EndpointCreate, id: str, repo: EndpointRepository = Depends(get_endpoint_repository)):
+async def update_endpoint(newEndpoint: EndpointCreate, id: str, repo: EndpointRepository = Depends(get_endpoint_repository), user: UserResponse = Depends(auth_user)):
   
   oldEndpoint = await repo.find_one_by_id(id)
 
