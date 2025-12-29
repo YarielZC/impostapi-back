@@ -1,18 +1,26 @@
 from datetime import datetime
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 class UserBase(BaseModel):
-  name: str
-  username: str
+  name: str = Field(min_length=1)
+  username: str = Field(min_length=3)
   email: str
+
+  @field_validator('username', mode='before')
+  @classmethod
+  def validate_username(cls, username: str):
+    return username.lower()
+
 
 class UserCreate(UserBase):
   password: str
-
 class UserResponse(UserBase):
   id: str = Field(alias='_id')
-  created_at: datetime
+  created_at: datetime = Field(default_factory=lambda: datetime.now())
 
   model_config = ConfigDict(
     populate_by_name=True,
   )
+
+class UserDB(UserCreate, UserResponse):
+  pass

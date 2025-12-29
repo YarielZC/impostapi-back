@@ -5,7 +5,9 @@ class BaseRepository:
     self.db = db
     self.collection = collection
 
-  def _map_doc(self, dic: dict) -> dict:
+  def _map_doc(self, dic: dict | None) -> dict:
+    if not dic:
+      raise Exception()
     try:
       dic['id'] = str(dic.pop('_id'))
     except KeyError:
