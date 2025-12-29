@@ -4,16 +4,17 @@ from models.user_model import UserResponse
 from repositories.endpoint_repository import get_endpoint_repository, EndpointRepository
 from repositories.project_repository import get_project_repository, ProjectRepository
 from repositories.user_repository import get_user_repository, UserRepository
-from models.endpoint_model import EndpointResponse, EndpointCreate
+from models.endpoint_model import EndpointResponse, EndpointCreate, EndpointUpdate
 from models.project_model import ProjectResponse
 from validations.endpoint_validation import endpoint_validation
+from logic.permissed_member_project import only_permissed_member_project
 
 manage_endpoint_router = APIRouter(prefix='/endpoint',
                    tags=['Manage Endpoint'],
                    )
 
 @manage_endpoint_router.put('/update/{id}', status_code=status.HTTP_201_CREATED, response_model=EndpointResponse)
-async def update_endpoint(newEndpoint: EndpointCreate, id: str, repo: EndpointRepository = Depends(get_endpoint_repository), repoProject: ProjectRepository = Depends(get_project_repository), repoUser: UserRepository = Depends(get_user_repository), user: UserResponse = Depends(auth_user)):
+async def update_endpoint(newEndpoint: EndpointUpdate, id: str, repo: EndpointRepository = Depends(get_endpoint_repository), repoProject: ProjectRepository = Depends(get_project_repository), repoUser: UserRepository = Depends(get_user_repository), user: UserResponse = Depends(auth_user)):
   
   oldEndpoint = await repo.find_one_by_id(id)
 
@@ -21,19 +22,12 @@ async def update_endpoint(newEndpoint: EndpointCreate, id: str, repo: EndpointRe
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                         detail='Endpoint not founded')
   
-  project = await repoProject.find_one_by_id(oldEndpoint['project_id'])
+  await only_permissed_member_project(repoProject=repoProject,
+                                project_id=oldEndpoint['project_id'],
+                                user=user)
 
-  if not project:
-    raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                        detail='Unknow error ocurred')
-  project = ProjectResponse(**project)
-  project_permissed_list = project.permissed
-
-  if not user.id in project_permissed_list:
-    raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
-                        detail='Forbidden')
-
-  result = await repo.update_one_by_id(id, newEndpoint)
+  endToCreate = EndpointCreate(**newEndpoint.model_dump(), project_id=oldEndpoint['project_id'])
+  result = await repo.update_one_by_id(id, endToCreate)
 
   if result != 0:
 
