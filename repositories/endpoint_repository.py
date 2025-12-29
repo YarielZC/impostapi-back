@@ -45,7 +45,7 @@ class EndpointRepository(BaseRepository):
     return result.inserted_id
     
   async def delete_by_id(self, id: str):
-    result = await self.db.delete_one({'_id': id})
+    result = await self.db.delete_one({'_id': self._to_object_id(id)})
     return result.deleted_count
   
 def get_endpoint_repository(database: AsyncDatabase = Depends(get_database)):
