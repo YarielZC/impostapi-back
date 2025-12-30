@@ -9,7 +9,6 @@ class EndpointBase(BaseModel):
   response: str | dict | None = None
   status_code: int
   delay: int | None = None
-  is_public: bool
 class EndpointCreate(EndpointBase):
   
   project_id: str

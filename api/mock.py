@@ -1,3 +1,4 @@
+import asyncio
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import JSONResponse
 
@@ -15,11 +16,16 @@ async def m(request: Request, user: str, project: str, fullpath: str, repo: Endp
 
   endpoint = await repo.find_one_by_advance_method({'path_url': fullpath,
                                                     'method': method})
-  
+  # print(fullpath)
   if not endpoint:
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                         detail=f'Endpoint: {fullpath} not founded with method: {method}')
   endpoint = EndpointResponse(**endpoint)
 
+  if endpoint.delay:
+      await asyncio.sleep(endpoint.delay / 1000)  
+      
+  if endpoint.status_code == 204:
+    return
   return JSONResponse(endpoint.response,
                       status_code=endpoint.status_code)
