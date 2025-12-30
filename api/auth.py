@@ -61,7 +61,7 @@ async def login(repo: UserRepository = Depends(get_user_repository), form: OAuth
     'exp': access_token_expiration
   }
 
-  refresh_token_expiration = datetime.utcnow() + timedelta(days=7)
+  refresh_token_expiration = datetime.utcnow() + timedelta(days=settings.REFRESH_TOKEN_DAY_DURATION)
   refresh_token = {
     'sub': user.username,
     'exp': refresh_token_expiration,
@@ -148,7 +148,7 @@ async def refresh_auth(token: str = Depends(oauth2), repo: UserRepository = Depe
     'exp': access_token_expiration
   }
 
-  refresh_token_expiration = datetime.utcnow() + timedelta(days=7)
+  refresh_token_expiration = datetime.utcnow() + timedelta(days=settings.REFRESH_TOKEN_DAY_DURATION)
   refresh_token = {
     'sub': user_db.username,
     'exp': refresh_token_expiration,

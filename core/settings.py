@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     TOKEN_DURATION: int = Field(alias="TOKEN_DURATION")
     SECRET_TOKEN_KEY: str = Field(alias="SECRET_TOKEN_KEY")
     ALGORITHM_CRYPT: str = Field(alias="ALGORITHM_CRYPT")
+    REFRESH_TOKEN_DAY_DURATION: int = Field(alias="REFRESH_TOKEN_DAY_DURATION")
     model_config = SettingsConfigDict(env_file=".env")
 
 
