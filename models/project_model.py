@@ -1,12 +1,13 @@
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 from datetime import datetime
 
-class ProjectCreate(BaseModel):
+class ProjectBase(BaseModel):
   name: str
   description: str | None = None
+class ProjectCreate(ProjectBase):
+  
   permissed: list[str] = []
   owner_id: str | None = None
-  update_at: datetime = Field(default_factory=lambda: datetime.now())
   create_at: datetime = Field(default_factory=lambda: datetime.now())
 
   @model_validator(mode='after')
@@ -17,6 +18,9 @@ class ProjectCreate(BaseModel):
       self.permissed = [self.owner_id]
     return self
 
+class ProjectUpdate(BaseModel):
+  name: str | None = None
+  description: str | None = None
 class ProjectResponse(ProjectCreate):
   id: str = Field(alias='_id')
 

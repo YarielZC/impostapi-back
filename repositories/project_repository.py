@@ -11,6 +11,27 @@ class ProjectRepository(BaseRepository):
     super().__init__(database, 'projects')
     self.db = database[self.collection]
 
+  async def update_name_and_description(self, id: str, name: str | None, description: str | None):
+    if name and description:
+      result = await self.db.update_one({'_id': self._to_object_id(id)}, {
+                                         '$set': {
+                                           'description': description,
+                                           'name': name
+                                         }})
+    elif name:
+      result = await self.db.update_one({'_id': self._to_object_id(id)}, {
+                                         '$set': {
+                                           'name': name
+                                         }})
+    elif description:
+      result = await self.db.update_one({'_id': self._to_object_id(id)}, {
+                                         '$set': {
+                                           'description': description
+                                         }})
+    else:
+      return -1
+    return result.modified_count
+
   async def find_one_by_advance_method(self, conditions: dict):
     result = await self.db.find_one(conditions)
 

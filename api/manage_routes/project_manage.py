@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, status, Depends
 from fastapi.responses import JSONResponse
 from logic.jwt_auth_user import auth_user
 from models.endpoint_model import EndpointResponse
-from models.project_model import ProjectCreate, ProjectResponse
+from models.project_model import ProjectBase, ProjectCreate, ProjectResponse, ProjectUpdate
 from models.user_model import UserResponse
 from repositories.user_repository import UserRepository, get_user_repository
 from repositories.project_repository import ProjectRepository, get_project_repository
@@ -43,6 +43,44 @@ async def create_project(project: ProjectCreate, repo: ProjectRepository = Depen
   if not result:
     raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                   detail='Unknow error')
+
+  return ProjectResponse(**result)
+
+@manage_project_router.patch('/update/{id}', response_model=ProjectResponse, status_code=status.HTTP_201_CREATED)
+async def update_project(id: str, project: ProjectUpdate, repo: ProjectRepository = Depends(get_project_repository), user: UserResponse = Depends(auth_user)):
+
+  oldProject = await only_permissed_member_project(repoProject=repo,
+                                      project_id=id,
+                                      user=user)
+
+  result = await repo.find_one_by_advance_method({'name': project.name,
+                                                  'owner_id': user.id})
+  
+  if not project.name and project.description:
+    if project.description == oldProject.description:
+      raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                        detail='Nothing to update')
+    
+  if project.name and project.description and result:
+    if project.description == oldProject.description:
+      raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                        detail='Nothing to update')
+
+  if result and not project.description:
+    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                        detail='A project with that name already exists')
+
+  result = await repo.update_name_and_description(id, project.name, project.description)
+
+  if result == -1:
+    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                        detail='Nothing to update')
+  
+  result = await repo.find_one_by_id(id)
+
+  if not result:
+    raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        detail='Unknow error')
 
   return ProjectResponse(**result)
 

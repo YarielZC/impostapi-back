@@ -17,3 +17,5 @@ async def only_permissed_member_project(repoProject: ProjectRepository, project_
   if not user.id in project_permissed_list:
     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                         detail='Forbidden')
+  
+  return project
