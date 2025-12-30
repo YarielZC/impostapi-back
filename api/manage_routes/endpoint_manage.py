@@ -25,6 +25,10 @@ async def update_endpoint(newEndpoint: EndpointUpdate, id: str, repo: EndpointRe
   await only_permissed_member_project(repoProject=repoProject,
                                 project_id=oldEndpoint['project_id'],
                                 user=user)
+  
+  if newEndpoint.delay and newEndpoint.delay > 5000:
+    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                        detail='Endpoint delay`s cannot be greater than 5000ms')
 
   endToCreate = EndpointCreate(**newEndpoint.model_dump(), project_id=oldEndpoint['project_id'])
   result = await repo.update_one_by_id(id, endToCreate)
@@ -70,6 +74,10 @@ async def create_endpoint(endpoint: EndpointCreate, repo: EndpointRepository = D
                                 project_id=endpoint.project_id,
                                 user=user)
   
+  if endpoint.delay and endpoint.delay > 5000:
+    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                        detail='Endpoint delay`s cannot be greater than 5000ms')
+
   await endpoint_validation(endpoint, repo, repoProject)
   
   id_newed = await repo.insert_one(endpoint)  
