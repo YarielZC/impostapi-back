@@ -11,6 +11,25 @@ class UserRepository(BaseRepository):
     super().__init__(database, 'users')
     self.db = database[self.collection]
 
+  async def update_password(self, id: str, newPassword: str):
+    result = await self.db.update_one({'_id': self._to_object_id(id)},
+                                      {
+                                        '$set': {
+                                          'password': newPassword
+                                        }
+                                      })
+    return result.modified_count
+
+  async def update_name(self, id: str, name: str):
+    result = await self.db.update_one({'_id': self._to_object_id(id)}, 
+                                      {
+                                        '$set': {
+                                          'name': name
+                                        }
+                                      })
+    
+    return result.modified_count
+
   async def find_one_by_field(self, field: str, value):
     result = await self.db.find_one({field: value})
 

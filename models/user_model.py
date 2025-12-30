@@ -2,7 +2,7 @@ from datetime import datetime
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 class UserBase(BaseModel):
-  name: str = Field(min_length=1)
+  name: str = Field(min_length=1, max_length=24)
   username: str = Field(min_length=3)
   email: str
   project_shared: list[str] = []
@@ -13,6 +13,12 @@ class UserBase(BaseModel):
   def validate_username(cls, username: str):
     return username.lower()
 
+class UserUpdate(BaseModel):
+  name: str = Field(min_length=1, max_length=24)
+
+class UserChangePassword(BaseModel):
+  old_password: str
+  new_password: str
 
 class UserCreate(UserBase):
   password: str
