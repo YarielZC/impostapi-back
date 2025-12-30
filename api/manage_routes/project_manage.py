@@ -16,6 +16,12 @@ manage_project_router = APIRouter(prefix='/project',
 
 @manage_project_router.post('/create', response_model=ProjectResponse, status_code=status.HTTP_201_CREATED)
 async def create_project(project: ProjectCreate, repo: ProjectRepository = Depends(get_project_repository), user: UserResponse = Depends(auth_user)):
+  result = await repo.find_one_by_advance_method({'name': project.name,
+                                                  'owner_id': user.id})
+
+  if result:
+    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                        detail='A project with that name already exists')
   
   newProject = project
   newProject.owner_id = user.id

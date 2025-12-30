@@ -11,6 +11,16 @@ class ProjectRepository(BaseRepository):
     super().__init__(database, 'projects')
     self.db = database[self.collection]
 
+  async def find_one_by_advance_method(self, conditions: dict):
+    result = await self.db.find_one(conditions)
+
+    try:
+      result = self._map_doc(result)
+    except:
+      return None
+    
+    return result
+
   async def find_one_by_field(self, field: str, value):
     return await self.db.find_one({field: value})
   
