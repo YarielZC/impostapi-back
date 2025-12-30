@@ -9,7 +9,7 @@ from repositories.project_repository import ProjectRepository, get_project_repos
 from repositories.endpoint_repository import EndpointRepository, get_endpoint_repository
 from logic.owner_project import owner_project_validate
 from logic.permissed_member_project import only_permissed_member_project
-##QUE UN USUARIO NO PUEDA CON LA ID DE UN PROYECTO ASIGNARLE UN ENDPOINT A UN PROYECTO QUE NO ES EL DE EL
+
 manage_project_router = APIRouter(prefix='/project',
                    tags=['Manage Project'],
                    )
