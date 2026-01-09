@@ -49,21 +49,22 @@ async def login(repo: UserRepository = Depends(get_user_repository), form: OAuth
     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                         detail='Username or password is wrong')
   
-  user = UserDB(**user)
+  userdb = UserDB(**user)
+  user = UserResponse(**user)
 
-  if not crypt.verify(form.password, user.password):
+  if not crypt.verify(form.password, userdb.password):
     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                         detail='Username or password is wrong')
   
   access_token_expiration = datetime.utcnow() + timedelta(minutes=settings.TOKEN_DURATION)
   access_token = {
-    'sub': user.username,
+    'sub': userdb.username,
     'exp': access_token_expiration
   }
 
   refresh_token_expiration = datetime.utcnow() + timedelta(days=settings.REFRESH_TOKEN_DAY_DURATION)
   refresh_token = {
-    'sub': user.username,
+    'sub': userdb.username,
     'exp': refresh_token_expiration,
     'type': 'refresh'
   }
@@ -72,7 +73,7 @@ async def login(repo: UserRepository = Depends(get_user_repository), form: OAuth
                             key=settings.SECRET_TOKEN_KEY,
                             algorithm=settings.ALGORITHM_CRYPT)
 
-  result = await repoRefreshToken.find_all(user.id)
+  result = await repoRefreshToken.find_all(userdb.id)
 
   newResult = []
 
@@ -87,7 +88,7 @@ async def login(repo: UserRepository = Depends(get_user_repository), form: OAuth
 
       await repoRefreshToken.delete_by_id(token_db.id)
 
-  newRefreshToken = RefreshToken(user_id=user.id,
+  newRefreshToken = RefreshToken(user_id=userdb.id,
                                  token=refresh_token)
   
   created_id = await repoRefreshToken.insert_one(newRefreshToken)
@@ -99,6 +100,7 @@ async def login(repo: UserRepository = Depends(get_user_repository), form: OAuth
 
   
   return {
+    'user': user.model_dump(),
     'access_token': jwt.encode(access_token,
                                key=settings.SECRET_TOKEN_KEY,
                                algorithm=settings.ALGORITHM_CRYPT),
