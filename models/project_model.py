@@ -4,6 +4,7 @@ from datetime import datetime
 class ProjectBase(BaseModel):
   name: str
   description: str | None = None
+  request_count: int = Field(default=0)
 class ProjectCreate(ProjectBase):
   
   permissed: list[str] = []
@@ -16,6 +17,7 @@ class ProjectCreate(ProjectBase):
       return self
     if self.permissed == []:
       self.permissed = [self.owner_id]
+    self.request_count = 0
     return self
 
 class ProjectUpdate(BaseModel):

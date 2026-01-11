@@ -74,5 +74,11 @@ class ProjectRepository(BaseRepository):
     })
     return result
   
+  async def add_request_count(self, id: str):
+    result = await self.db.update_one({'_id': self._to_object_id(id)}, {
+      '$inc': {'request_count': 1}
+    })
+    return result
+  
 def get_project_repository(database: AsyncDatabase = Depends(get_database)):
   return ProjectRepository(database=database)

@@ -4,6 +4,7 @@ from pydantic import Field
 
 class Settings(BaseSettings):
     MONGO_URI: str = Field(alias="MONGO_URI")
+    MY_BASE_URL: str = Field(alias="MY_BASE_URL")
     DB_NAME: str = Field(alias="DB_NAME")
     TOKEN_DURATION: int = Field(alias="TOKEN_DURATION")
     SECRET_TOKEN_KEY: str = Field(alias="SECRET_TOKEN_KEY")
