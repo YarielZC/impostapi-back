@@ -3,11 +3,10 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 class UserBase(BaseModel):
   name: str = Field(min_length=1, max_length=24)
-  username: str = Field(min_length=3)
+  username: str = Field(min_length=3, max_length=18)
   email: str
   project_shared: list[str] = []
   created_at: datetime = Field(default_factory=lambda: datetime.now())
-
   @field_validator('username', mode='before')
   @classmethod
   def validate_username(cls, username: str):
