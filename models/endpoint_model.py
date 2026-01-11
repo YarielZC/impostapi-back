@@ -15,6 +15,9 @@ class EndpointCreate(EndpointBase):
   update_at: datetime = Field(default_factory=lambda: datetime.now())
   created_at: datetime = Field(default_factory=lambda: datetime.now())
 
+  def change_url(self, url: str):
+    self.path_url = url
+
 class EndpointUpdate(EndpointBase):
   pass
 class EndpointResponse(EndpointCreate):

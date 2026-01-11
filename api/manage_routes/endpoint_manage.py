@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException, status, Depends
+from core.settings import settings
 from logic.jwt_auth_user import auth_user
 from models.user_model import UserResponse
 from repositories.endpoint_repository import get_endpoint_repository, EndpointRepository
@@ -70,7 +71,7 @@ async def delete_endpoint(id: str, repo: EndpointRepository = Depends(get_endpoi
 @manage_endpoint_router.post('/create', response_model=EndpointResponse, status_code=status.HTTP_201_CREATED)
 async def create_endpoint(endpoint: EndpointCreate, repo: EndpointRepository = Depends(get_endpoint_repository), repoProject: ProjectRepository = Depends(get_project_repository), user: UserResponse = Depends(auth_user)):
   
-  await only_permissed_member_project(repoProject=repoProject,
+  project = await only_permissed_member_project(repoProject=repoProject,
                                 project_id=endpoint.project_id,
                                 user=user)
   
@@ -79,7 +80,7 @@ async def create_endpoint(endpoint: EndpointCreate, repo: EndpointRepository = D
                         detail='Endpoint delay`s cannot be greater than 5000ms')
 
   await endpoint_validation(endpoint, repo, repoProject)
-  
+  endpoint.change_url(f'{user.username}/{project.name}/{endpoint.path_url}')
   id_newed = await repo.insert_one(endpoint)  
 
   if not id_newed:
